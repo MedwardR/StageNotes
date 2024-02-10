@@ -1,0 +1,65 @@
+:root {
+	font-family: sans-serif;	/* adjust font here */
+	font-size: 8vh;				/* adjust font size here */
+	line-height: 150%;			/* adjust internal line spacing here */
+	cursor: none;				/* adjust cursor type/visibility here */
+	--page-margin: 10vh;		/* adjust page margins here */
+	--bg-color: #000;			/* adjust page background color here */
+}
+body {
+	margin: 0 var(--page-margin) var(--page-margin) var(--page-margin);
+	background-color: var(--bg-color);
+	color: #fff;
+	overflow: visible;
+}
+line, action, speaker {
+	display: flex;
+	flex-direction: row;
+	text-align: justify;
+}
+line, action {
+	padding-top: var(--page-margin);
+	filter: none;
+	opacity: 1;
+	transition: filter 0.5s ease, opacity 0.5s ease;
+}
+speaker {
+	margin-right: 2vh;			/* adjust spacing between speaker labels and spoken lines here */
+}
+action {
+	justify-content: center;
+	font-style: italic;
+}
+
+
+/* adjust style presets here */
+
+[a] {
+	color: #21f8f6;
+}
+[b] {
+	color: #ffa008;
+}
+[c] {
+	color: #39ff14;
+}
+/* feel free to add more presets :D */
+
+
+
+#fade-top, #fade-bottom {
+	display: block;
+	position: fixed;
+	left: 0;
+	right: 0;
+	height: var(--page-margin);
+}
+#fade-top
+{
+	top: 0;
+	background-image: linear-gradient(var(--bg-color), transparent);
+}
+#fade-bottom {
+	bottom: 0;
+	background-image: linear-gradient(transparent, var(--bg-color));
+}
