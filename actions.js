@@ -9,7 +9,7 @@ const showNextLine = true;					// set this to 'true' if you would like the line 
 const opacityOfItemsOutsideHighlight = 0.4;	// adjust the opacity of lines outside the highlight here
 const opacityOfActions = 1;					// adjust the opacity of actions here
 const useBlurEffect = true;					// toggle blur effect here
-const blurEffectRadius = 1;					// adjust blur effect radius here
+const blurEffectRadius = 0.5;					// adjust blur effect radius here
 
 // ############################################################################################################
 
