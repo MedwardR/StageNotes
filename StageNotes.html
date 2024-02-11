@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Skit Lines</title>
+		<style>
+			:root {
+			font-family: sans-serif;	/* adjust font here */
+			font-size: 8vh;				/* adjust font size here */
+			line-height: 150%;			/* adjust internal line spacing here */
+			cursor: none;				/* adjust cursor type/visibility here */
+			--page-margin: 10vh;		/* adjust page margins here */
+			--bg-color: #000;			/* adjust page background color here */
+			}
+			body {
+				margin: 0 var(--page-margin) var(--page-margin) var(--page-margin);
+				background-color: var(--bg-color);
+				color: #fff;
+				overflow: visible;
+			}
+			line, action, speaker {
+				display: flex;
+				flex-direction: row;
+				text-align: justify;
+			}
+			line, action {
+				padding-top: var(--page-margin);
+				filter: none;
+				opacity: 1;
+				transition: filter 0.5s ease, opacity 0.5s ease;
+			}
+			speaker {
+				margin-right: 2vh;			/* adjust spacing between speaker labels and spoken lines here */
+			}
+			action {
+				justify-content: center;
+				font-style: italic;
+			}
+
+
+			/* adjust style presets here */
+
+			[a] {
+				color: #21f8f6;
+			}
+			[b] {
+				color: #ffa008;
+			}
+			[c] {
+				color: #39ff14;
+			}
+			/* feel free to add more presets :D */
+
+
+			#fade-top, #fade-bottom {
+				display: block;
+				position: fixed;
+				left: 0;
+				right: 0;
+				height: var(--page-margin);
+			}
+			#fade-top
+			{
+				top: 0;
+				background-image: linear-gradient(var(--bg-color), transparent);
+			}
+			#fade-bottom {
+				bottom: 0;
+				background-image: linear-gradient(transparent, var(--bg-color));
+			}
+		</style>
+	</head>
+	<body>
+		<!-- Use the <line> tag to display spoken lines -->
+		<!-- Use the <speaker> tag inside of a <line> to display who is speaking the line -->
+		<!-- Use the <action> tag to display something the actor(s) should do -->
+		<!-- Use the 'a', 'b', or 'c' attributes to apply a style preset -->
+		
+		<line>
+			<speaker a>Mark:</speaker>
+			Brrr, this wind is biting! Feels like winter decided to stick around a bit longer
+		</line>
+		<action>(Mark pulls his coat collar up tighter, shivering)</action>
+		<line>
+			<speaker b>David:</speaker>
+			You said it. At least the sun is finally out, though. Might melt some of this ice on the sidewalk.
+		</line>
+		<line>
+			<speaker a>Mark:</speaker>
+			True, a little sunshine always helps. Though I wouldn't mind a good spring snowstorm, you know, the kind that melts quickly and brings all the flowers out.
+		</line>
+		<action>(Mark scuffs his boots on the icy sidewalk)</action>
+		
+		<!-- These elements are not part of the content -->
+		<generic id="fade-top"></generic>
+		<generic id="fade-bottom"></generic>
+		<script>
+			// ################################################ SETTINGS ################################################
+
+			const speakerHighlighting = true;			// toggle speaker highlighting here
+
+			// the settings below only apply if speaker highlighting is set to 'true'
+
+			const showItemsOutsideHighlight = false;	// set this to 'true' if you would like lines outside the highlight to be shown
+			const showNextLine = true;					// set this to 'true' if you would like the line after the highlight to be shown (only applies if the previous setting is set to 'false')
+			const opacityOfItemsOutsideHighlight = 0.4;	// adjust the opacity of lines outside the highlight here
+			const opacityOfActions = 1;					// adjust the opacity of actions here
+			const useBlurEffect = true;					// toggle blur effect here
+			const blurEffectRadius = 1;					// adjust blur effect radius here
+
+			// ############################################################################################################
+
+			let linesAndActions;
+			let followingActions;
+			let lineIndex = 0;
+
+			window.onload = function () // runs as soon as the page loads
+			{
+				linesAndActions = document.querySelectorAll("line,action"); // gets all 'line' and 'action' elements
+				linesAndActions[lineIndex].scrollIntoView({ behavior: "smooth" }); // scrolls to the first line/action
+				updateEffects();
+			}
+
+			document.addEventListener("keydown", (event) => { // runs whenever a key is pressed
+				let validKeyPressed = false;
+				if (event.key === 'ArrowRight') { // if the right arrow key is pressed
+					validKeyPressed = true;
+					do // skips over action elements
+					{
+						lineIndex++;
+					}
+					while (linesAndActions[lineIndex] != null && linesAndActions[lineIndex].tagName === "ACTION");
+				}
+				else if (event.key === 'ArrowLeft') { // if the left arrow key is pressed
+					validKeyPressed = true;
+					do // skips over action elements
+					{
+						lineIndex--;
+					}
+					while (linesAndActions[lineIndex] != null && linesAndActions[lineIndex].tagName === "ACTION");
+				}
+
+				if (validKeyPressed === true) // only if one if the previous keys is pressed
+				{
+					lineIndex = clamp(lineIndex, 0, linesAndActions.length - 1); // keeps the line index from going outside the bounds of the array
+
+					linesAndActions[lineIndex].scrollIntoView({ behavior: "smooth" }); // scrolls to the current line
+					updateEffects();
+				}
+			});
+
+			function updateEffects()
+			{
+				if (!speakerHighlighting)
+				{
+					return;
+					// this method will not be run if speaker highlighting is off
+				}
+				
+				// updates the number of actions following the current line
+				followingActions = 0;
+				while (linesAndActions[lineIndex + 1 + followingActions] != null && linesAndActions[lineIndex + 1 + followingActions].tagName === "ACTION")
+				{
+					followingActions++;
+				}
+				
+				for (let i = 0; i < linesAndActions.length; i++) // runs the following code as many times as there are lines/actions
+				{		
+					let blurAmount;
+					let opacityAmount;
+					
+					if (i === lineIndex) // for the current line
+					{
+						blurAmount = "0";
+						opacityAmount = 1;
+					}
+					else if (i > lineIndex && i <= lineIndex + followingActions) // for any following actions
+					{
+						blurAmount = "0";
+						opacityAmount = opacityOfActions;
+					}
+					else if (i === lineIndex + followingActions + 1) // for the next line (after following actions)
+					{
+						blurAmount = "0";
+						opacityAmount = opacityOfItemsOutsideHighlight;
+					}
+					else // for any other lines and/or actions
+					{
+						if (showItemsOutsideHighlight) // if items outside the highlight are being shown
+						{
+							if (linesAndActions[i].tagName === "ACTION") // for 'action' elements
+							{
+								blurAmount = "0"
+								opacityAmount = opacityOfItemsOutsideHighlight * opacityOfActions;
+							}
+							else // for 'line' elements (or anything that's not an action)
+							{
+								blurAmount = "0"
+								opacityAmount = opacityOfItemsOutsideHighlight;
+							}
+						}
+						else // if items outside the highlight are not being shown
+						{
+							blurAmount = blurEffectRadius + "vh"
+							opacityAmount = 0;
+						}
+					}
+					
+					// assigns the style to the item
+					if (useBlurEffect)
+					{
+						linesAndActions[i].style.filter = "blur(" + blurAmount + ")"
+					}
+					linesAndActions[i].style.opacity = opacityAmount;
+				}
+			}
+
+			function clamp(value, min, max)
+			{
+				if (value < min)
+				{
+					value = min;
+				}
+				else if (value > max)
+				{
+					value = max;
+				}
+				return value;
+			}
+		</script>
+	</body>
+</html>
